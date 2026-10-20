@@ -40,6 +40,8 @@ class CodePilotAgent:
         # 1. Discover repository files and test suite
         test_files = self.reader.find_test_files()
         code_files = self.reader.list_files(extensions=[".py"])
+        src_candidates = [f for f in code_files if f not in test_files]
+
         task.plan = [
             f"Analyze repository tree ({len(code_files)} source files, {len(test_files)} test files)",
             f"Run baseline test suite: {task.test_command}",
@@ -64,19 +66,26 @@ class CodePilotAgent:
             last_exec = task.execution_history[-1]
             diagnosis = DiagnosticEngine.diagnose(last_exec.stdout, last_exec.stderr)
 
-            # Determine target file to patch
+            # Determine target source file to patch (never patch the test file unless no other file exists)
             target_file = None
-            if diagnosis.failing_file:
+            if diagnosis.failing_file and not Path(diagnosis.failing_file).name.startswith("test_"):
                 try:
                     rel = Path(diagnosis.failing_file).relative_to(self.repo_path).as_posix()
                     target_file = rel
                 except ValueError:
                     target_file = diagnosis.failing_file
 
-            if not target_file or not (self.repo_path / target_file).exists():
-                # Fallback to first non-test python file
-                src_candidates = [f for f in code_files if f not in test_files]
-                target_file = src_candidates[0] if src_candidates else (code_files[0] if code_files else None)
+            if not target_file:
+                # Find corresponding source file by matching stem: e.g. test_discount.py -> discount.py
+                if diagnosis.failing_file:
+                    base_name = Path(diagnosis.failing_file).stem.replace("test_", "")
+                    for f in src_candidates:
+                        if Path(f).stem == base_name:
+                            target_file = f
+                            break
+
+                if not target_file:
+                    target_file = src_candidates[0] if src_candidates else (code_files[0] if code_files else None)
 
             if not target_file:
                 task.status = TaskStatus.FAILED
@@ -89,7 +98,6 @@ class CodePilotAgent:
             if self.patch_generator:
                 repaired_code = self.patch_generator(target_file, original_code, diagnosis)
             else:
-                # Without an LLM or generator supplied, cannot invent code repair
                 task.status = TaskStatus.FAILED
                 task.metadata["error"] = "No patch generator configured to synthesize code fix"
                 return task

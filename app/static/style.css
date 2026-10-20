@@ -321,6 +321,7 @@ button {
 .gradient-text {
   background: linear-gradient(135deg, var(--accent-purple-start) 0%, var(--accent-purple-mid) 40%, var(--accent-purple-end) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }
@@ -387,6 +388,7 @@ button {
 .metric-number.purple {
   background: linear-gradient(135deg, var(--accent-purple-start), var(--accent-purple-end));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -746,6 +748,7 @@ button {
 .ai-sparkle-icon {
   background: linear-gradient(135deg, var(--accent-purple-start), var(--accent-purple-end));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

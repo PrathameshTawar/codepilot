@@ -57,7 +57,7 @@
 
       // Grid
       ctx.lineWidth = 1;
-      ctx.strokeStyle = isDark ? "rgba(192, 132, 252, 0.05)" : "rgba(124, 58, 237, 0.05)";
+      ctx.strokeStyle = isDark ? "rgba(34, 211, 238, 0.08)" : "rgba(59, 130, 246, 0.08)";
       ctx.beginPath();
       for (let x = 0; x <= width; x += gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, height); }
       for (let y = 0; y <= height; y += gridSize) { ctx.moveTo(0, y); ctx.lineTo(width, y); }
@@ -67,7 +67,7 @@
       particles.forEach((p) => {
         p.y += p.speed;
         if (p.y > height) { p.y = 0; p.x = Math.floor(Math.random() * (width / gridSize)) * gridSize; }
-        ctx.fillStyle = isDark ? "rgba(192, 132, 252, 0.8)" : "rgba(124, 58, 237, 0.7)";
+        ctx.fillStyle = isDark ? "rgba(34, 211, 238, 0.85)" : "rgba(59, 130, 246, 0.75)";
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -149,8 +149,8 @@
       // Print Final Status
       appendLog(`\n[Resolution Status]: ${task.status.toUpperCase()}`, "success");
       liveStatusText.textContent = "READY FOR APPROVAL";
-      statusBeacon.style.background = "#27c93f";
-      statusBeacon.style.boxShadow = "0 0 10px #27c93f";
+      statusBeacon.style.background = "#34d399";
+      statusBeacon.style.boxShadow = "0 0 10px #34d399";
 
       // Show Human-in-the-loop Gate
       approvalGate.style.display = "flex";

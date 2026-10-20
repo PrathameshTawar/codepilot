@@ -31,21 +31,29 @@ class DiagnosticEngine:
             failing_tests = re.findall(r"FAILED\s+([^\s]+)", combined)
         report.failing_tests = list(dict.fromkeys(failing_tests))
 
-        # Find primary exception: e.g. "AssertionError: assert 10 == 20" or "ZeroDivisionError: division by zero"
+        # Find explicit exception: e.g. "AssertionError: assert 10 == 20" or "ZeroDivisionError: division by zero"
         exc_match = re.search(r"((?:[A-Za-z]+Error|Exception):\s*[^\r\n]*)", combined)
         if exc_match:
             report.primary_error = exc_match.group(1).strip()
+
+        # Find assertion detail lines (e.g., E       assert -1900 == 80)
+        assert_lines = re.findall(r"(E\s{3,}.*)", combined)
+        if assert_lines:
+            report.assertion_details = "\n".join(line.strip() for line in assert_lines[:5])
+            # If pytest formatted without explicit "AssertionError:" word, infer from "assert ..."
+            if not report.primary_error:
+                first_assert = re.sub(r"^E\s+", "", assert_lines[0]).strip()
+                report.primary_error = f"AssertionError: {first_assert}"
 
         # Find file and line from traceback: e.g. File "...", line 12, in ...
         tb_match = re.search(r'File\s+"([^"]+)",\s+line\s+(\d+)', combined)
         if tb_match:
             report.failing_file = tb_match.group(1)
             report.line_number = int(tb_match.group(2))
-
-        # Find assertion detail lines (e.g., E       assert -1900 == 80)
-        assert_lines = re.findall(r"(E\s{3,}.*)", combined)
-        if assert_lines:
-            report.assertion_details = "\n".join(line.strip() for line in assert_lines[:5])
+        elif report.failing_tests:
+            # Infer test file from test identifier: e.g. tests/test_discount.py::test_percentage_discount
+            first_test_file = report.failing_tests[0].split("::")[0]
+            report.failing_file = first_test_file
 
         # Generate a concise summary
         if report.failing_tests or report.primary_error:

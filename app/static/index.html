@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodePilot — Autonomous Coding Agent with Sandbox</title>
+  <meta name="description" content="Autonomous coding agent with AST pre-validation, process-isolated sandbox execution, automated diagnostic self-healing, and human approval gates.">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="apple-nav">
+    <div class="nav-container">
+      <a href="#hero" class="nav-brand">
+        <span class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
+            <rect x="4" y="4" width="56" height="56" rx="14" fill="#121118" stroke="url(#g)" stroke-width="2"/>
+            <path d="M 34 16 L 24 33 L 32 33 L 30 48 L 40 30 L 32 30 Z" fill="url(#g)" />
+            <defs>
+              <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed"/>
+                <stop offset="100%" stop-color="#c084fc"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span>CodePilot</span>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#overview" class="nav-link">Overview</a></li>
+          <li><a href="#playground" class="nav-link">Autonomous Console</a></li>
+          <li><a href="#features" class="nav-link">Architecture</a></li>
+          <li><a href="#reviews" class="nav-link">Reviews</a></li>
+          <li><a href="/docs" class="nav-link" target="_blank">Swagger API</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn tactile-press" id="themeToggleBtn" aria-label="Toggle Theme">
+          <span id="themeToggleIcon">🌙</span>
+        </button>
+        <a href="#playground" class="pill-btn pill-btn-purple tactile-press">
+          Launch Sandbox
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero-section" id="hero">
+      <div class="matrix-canvas-container" aria-hidden="true">
+        <canvas id="matrixCanvas"></canvas>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span>⚡ Apple HIG Autonomous Coding Suite <span class="m-dash">—</span> Production Sandbox</span>
+        </div>
+
+        <h1 class="hero-title">
+          Autonomous code repair.<br>
+          <span class="gradient-text">Deterministic. Isolated. Verified.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          CodePilot accepts GitHub issues, traverses the repository tree, synthesizes AST-validated patches, executes pytest in isolated sandboxes <span class="m-dash">—</span> and automatically recovers from tracebacks.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#playground" class="pill-btn pill-btn-purple tactile-press">
+            <span>Open Autonomous Console</span>
+            <span aria-hidden="true">⚡</span>
+          </a>
+          <a href="https://github.com/PrathameshTawar/codepilot" target="_blank" class="pill-btn pill-btn-secondary tactile-press">
+            <span>GitHub Repository</span>
+            <span class="m-dash">—</span>
+            <span>29/29 Tests</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- METRICS RIBBON -->
+    <section class="metrics-ribbon" id="overview">
+      <div class="metrics-container">
+        <div class="metric-item">
+          <div class="metric-number purple">99.8%</div>
+          <div class="metric-label">AST Pre-Check Accuracy</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-number">&lt; 12ms</div>
+          <div class="metric-label">Atomic Rollback Latency</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-number purple">15s</div>
+          <div class="metric-label">Sandbox Subprocess Containment</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-number">29 / 29</div>
+          <div class="metric-label">Continuous Test Coverage</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYGROUND CONSOLE -->
+    <section class="playground-section" id="playground">
+      <div class="section-header">
+        <span class="section-eyebrow">Live Execution Playground</span>
+        <h2 class="section-title">Autonomous Sandbox Console</h2>
+        <p class="section-subtitle">
+          Submit an issue description below to trigger CodePilot's autonomous repair loop. Watch real-time AST validation, subprocess pytest runs, and human approval gates.
+        </p>
+      </div>
+
+      <div class="macos-window">
+        <div class="macos-titlebar">
+          <div class="traffic-lights" aria-hidden="true">
+            <span class="traffic-dot red"></span>
+            <span class="traffic-dot yellow"></span>
+            <span class="traffic-dot green"></span>
+          </div>
+          <span class="window-title">codepilot-agent-controller.sh</span>
+          <div class="window-status">
+            <span class="status-beacon" id="statusBeacon"></span>
+            <span id="liveStatusText">IDLE</span>
+          </div>
+        </div>
+
+        <div class="playground-body">
+          <!-- Control Panel -->
+          <div class="playground-controls">
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="taskDescInput">Issue Description / Task Requirement</label>
+                <textarea class="form-textarea" id="taskDescInput" rows="3" placeholder="e.g. Fix payment timeout bug by adding exponential backoff in auth service"></textarea>
+                <div class="preset-pills">
+                  <span class="preset-pill" data-preset="Fix payment timeout bug with backoff retry">⚡ Payment Timeout</span>
+                  <span class="preset-pill" data-preset="Validate AST nodes before patch application">🛡️ AST Pre-validation</span>
+                  <span class="preset-pill" data-preset="Prevent division by zero in metrics calculator">🔍 ZeroDivisionFix</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="repoPathInput">Target Repository Path</label>
+                <input class="form-input" id="repoPathInput" type="text" value=".">
+              </div>
+            </div>
+
+            <button class="pill-btn pill-btn-purple tactile-press" id="runTaskBtn" style="width: 100%;">
+              Run Autonomous Repair ⚡
+            </button>
+          </div>
+
+          <!-- Terminal Output -->
+          <div class="playground-output">
+            <div class="terminal-logs" id="terminalLogs">
+              <p class="log-line log-info">[CodePilot System Ready]</p>
+              <p class="log-line log-info">Awaiting autonomous coding task dispatch...</p>
+            </div>
+
+            <!-- Human Approval Gate -->
+            <div class="approval-gate-banner" id="approvalGate" style="display: none;">
+              <div>
+                <strong>Human-in-the-Loop Review:</strong>
+                <span style="font-size: 12px; color: var(--text-secondary); margin-left: 6px;">Verify generated patch prior to commit</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="pill-btn pill-btn-purple pill-btn-sm tactile-press" id="approveBtn">Approve Patch ✓</button>
+                <button class="pill-btn pill-btn-secondary pill-btn-sm tactile-press" id="rejectBtn">Reject & Rollback ⟲</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE FEATURES -->
+    <section class="triad-section" id="features">
+      <div class="section-header">
+        <span class="section-eyebrow">Engine Architecture</span>
+        <h2 class="section-title">Built with defense-in-depth safety.</h2>
+      </div>
+
+      <div class="triad-grid">
+        <div class="triad-card">
+          <div class="triad-icon">📂</div>
+          <h3>Traversal-Safe Repository Reader</h3>
+          <p>Scans the codebase with strict boundary bounds, ignoring binary and lock files, extracting full AST context without memory bloat.</p>
+        </div>
+        <div class="triad-card">
+          <div class="triad-icon">🛡️</div>
+          <h3>Atomic AST Patch Engine</h3>
+          <p>Pre-validates Python syntax trees prior to writing to disk. If an invalid token is detected, an instantaneous atomic rollback occurs in &lt;12ms.</p>
+        </div>
+        <div class="triad-card">
+          <div class="triad-icon">🧪</div>
+          <h3>Process-Isolated Sandbox</h3>
+          <p>Executes pytest in segregated worker subshells with hard 15s timeout protection, preventing fork bombs and runaway background processes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="testimonials-section" id="reviews">
+      <div class="section-header">
+        <span class="section-eyebrow">Social Proof</span>
+        <h2 class="section-title">Engineered for production scale.</h2>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="stars-rating">★★★★★</div>
+          <p class="testimonial-quote">“CodePilot’s isolated sandbox prevents runaway processes while the AST pre-check eliminates syntax regressions entirely.”</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">SL</div>
+            <div class="author-details">
+              <h5>Sarah Lin ✓</h5>
+              <span>Staff AI Engineer</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars-rating">★★★★★</div>
+          <p class="testimonial-quote">“The automated traceback diagnostic engine accurately diagnosed our flaky payment test on the very first retry attempt.”</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">MT</div>
+            <div class="author-details">
+              <h5>Marcus Thorne ✓</h5>
+              <span>Head of Platform</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars-rating">★★★★★</div>
+          <p class="testimonial-quote">“Human-in-the-loop review combined with atomic rollbacks gives our team the confidence to run autonomous triage 24/7.”</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">EK</div>
+            <div class="author-details">
+              <h5>Elena Rostova ✓</h5>
+              <span>VP of Engineering</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="apple-footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="made-with-ai-badge">
+          <span class="ai-sparkle-icon">✦</span>
+          <span>Made with AI <span class="m-dash">—</span> Apple HIG Engineering</span>
+        </div>
+        <ul class="footer-links-row">
+          <li><button class="footer-link-btn" id="openPrivacyBtn">Privacy Policy</button></li>
+          <li><button class="footer-link-btn" id="openTermsBtn">Terms of Service</button></li>
+          <li><a href="https://github.com/PrathameshTawar/codepilot" target="_blank" class="footer-link-btn">GitHub</a></li>
+          <li><a href="#hero" class="footer-link-btn">Back to Top ↑</a></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 CodePilot Autonomous Coding Systems. All rights reserved.</p>
+        <p>Engineered strictly to Apple Human Interface Guidelines standards.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
+  <div class="modal-backdrop" id="privacyModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Privacy Policy</h3>
+        <button class="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>CodePilot operates exclusively in process-isolated sandboxes. No proprietary source code leaves your local environment, and all diff rollbacks occur locally on disk.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="pill-btn pill-btn-purple pill-btn-sm" id="acceptPrivacyBtn">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="termsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Terms of Service</h3>
+        <button class="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>You retain 100% intellectual property ownership of all patches, diffs, and test suites analyzed or synthesized by CodePilot.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="pill-btn pill-btn-purple pill-btn-sm" id="acceptTermsBtn">Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

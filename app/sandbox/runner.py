@@ -54,10 +54,12 @@ class SandboxRunner:
     def extract_failure_signature(self, stdout: str, stderr: str) -> Optional[str]:
         """Extracts the primary exception name and failing summary from test output."""
         combined = f"{stdout}\n{stderr}"
-        # Look for standard Python tracebacks e.g. "AssertionError: expected ..." or "FAILED tests/... - AssertionError"
         match = re.search(r"((?:[A-Za-z]+Error|Exception|FAILED):?\s*[^\r\n]*)", combined)
         if match:
             return match.group(1).strip()
+        assert_match = re.search(r"(E\s+assert\s+[^\r\n]*)", combined)
+        if assert_match:
+            return f"AssertionError: {assert_match.group(1).strip()}"
         return None
 
     def run(self, command: str | List[str], timeout: Optional[float] = None) -> ExecutionResult:
@@ -69,7 +71,6 @@ class SandboxRunner:
             cmd_args = command
         else:
             cmd_str = command
-            # If command begins with 'pytest' or 'python', normalize executable on Windows
             if cmd_str.startswith("pytest"):
                 cmd_args = [sys.executable, "-m", "pytest"] + shlex.split(cmd_str)[1:]
             elif cmd_str.startswith("python "):
@@ -81,9 +82,10 @@ class SandboxRunner:
 
         start_time = time.time()
         try:
-            # Minimal sanitized environment
             env = os.environ.copy()
             env["PYTHONPATH"] = str(self.workspace_dir)
+            # Disable 3rd party plugins to keep sandbox lightweight and deterministic
+            env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
 
             process = subprocess.run(
                 cmd_args,

@@ -1,7 +1,10 @@
 """FastAPI server exposing CodePilot autonomous coding endpoints, task lifecycle, and human review."""
 
+from pathlib import Path
 from typing import Dict
 from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from app import __version__
 from app.agent.controller import CodePilotAgent
 from app.api.schemas import (
@@ -20,6 +23,20 @@ app = FastAPI(
     version=__version__,
     description="Autonomous Coding Agent with Secure Sandbox and Bounded Self-Correction",
 )
+
+# Static files for Apple HIG frontend
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/", tags=["UI"], include_in_schema=False)
+def serve_ui():
+    """Serves Apple HIG frontend interface."""
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"message": "CodePilot API active. Static UI not built."}
 
 # In-memory storage for tasks and human reviews
 TASKS_DB: Dict[str, CodingTask] = {}

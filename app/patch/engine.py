@@ -16,9 +16,9 @@ class PatchEngine:
         self.reader = reader
 
     def create_diff(self, file_path: str, original: str, modified: str) -> str:
-        """Generates unified diff between original and modified content."""
-        orig_lines = original.splitlines(keepends=True)
-        mod_lines = modified.splitlines(keepends=True)
+        """Generates standard, valid unified diff between original and modified content."""
+        orig_lines = original.splitlines()
+        mod_lines = modified.splitlines()
         diff_lines = list(
             difflib.unified_diff(
                 orig_lines,
@@ -28,7 +28,9 @@ class PatchEngine:
                 lineterm="",
             )
         )
-        return "".join(diff_lines)
+        if not diff_lines:
+            return ""
+        return "\n".join(diff_lines) + "\n"
 
     def validate_syntax(self, content: str, file_path: str) -> Tuple[bool, Optional[str]]:
         """Validates syntax using Python AST parser for Python files."""
@@ -67,6 +69,7 @@ class PatchEngine:
             diff=diff,
             applied=True,
             message="Patch applied and verified cleanly",
+            patched_content=modified_content,
         )
 
     def rollback(self, file_path: str, original_content: str) -> None:

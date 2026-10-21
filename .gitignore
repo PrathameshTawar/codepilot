@@ -54,3 +54,6 @@ artifacts/
 temp_repos/
 sandboxes/
 *.log
+*.db
+*.sqlite3
+codepilot_tasks.db

@@ -28,6 +28,7 @@ class PatchResult(BaseModel):
     diff: str
     applied: bool = False
     message: str = ""
+    patched_content: Optional[str] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

@@ -12,6 +12,7 @@ class CreateTaskRequest(BaseModel):
     repo_path: str = Field(..., description="Absolute or relative path to the local repository")
     test_command: str = Field(default="pytest", description="Command used to run verification tests")
     max_attempts: int = Field(default=3, ge=1, le=10, description="Maximum bounded self-correction attempts")
+    run_in_background: bool = Field(default=False, description="Whether to execute task asynchronously in background")
 
 
 class PatchSummary(BaseModel):
